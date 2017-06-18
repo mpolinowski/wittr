@@ -59,7 +59,7 @@ Do this before running "npm install" - also make sure that you have Python 2.7 i
 ### 4 Create Serviceworker
 ___
 
-Go to wittr/public/js/sw/index.js and add the following lines:
+Go to [wittr/public/js/sw/index.js](https://github.com/mpolinowski/wittr/blob/course-notes/public/js/sw/index.js) and add the following lines:
 
 ```
 self.addEventListener('fetch', function(event) {
@@ -70,7 +70,7 @@ self.addEventListener('fetch', function(event) {
 ### 5 Register Serviceworker
 ___
 
-Go to wittr/public/js/main/indexController.js and add the following lines:
+Go to [wittr/public/js/main/indexController.js](https://github.com/mpolinowski/wittr/blob/course-notes/public/js/main/IndexController.js) and add the following lines:
 
 ```
 export default function IndexController(container) {
