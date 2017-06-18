@@ -3,10 +3,11 @@
 This is a silly little demo app for an offline-first course.
 
 
-1. [Installation](#1-Installation)
-2. [Start App in Node](#2-Start-App-in-Node)
-3. [Troubleshooting](#3-Troubleshooting)
-4. [Create Serviceworker](#4-Create-Serviceworker)
+1. [Installation](1-installation)
+2. [Start App in Node](#2-start-app-in-node)
+3. [Troubleshooting](#3-troubleshooting)
+4. [Create Serviceworker](#4-create-serviceworker)
+5. [Create Serviceworker](#5-register-serviceworker)
 
 
 ### 1 Installation
