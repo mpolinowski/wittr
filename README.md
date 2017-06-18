@@ -82,6 +82,8 @@ and
 ```
 // Register Serviceworker
 IndexController.prototype._registerServiceWorker = function() {
+
+  //Check if Browser supports serviceWorkers
   if (!navigator.serviceWorker) return;
 
   navigator.serviceWorker.register('/sw.js').then(function() {
@@ -89,5 +91,6 @@ IndexController.prototype._registerServiceWorker = function() {
   }).catch(function() {
     console.log('Service Worker Registration failed...');
   });
+
 };
 ```
