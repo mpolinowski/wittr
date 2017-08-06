@@ -13,60 +13,66 @@ export default function IndexController(container) {
 
 // Register Serviceworker
 IndexController.prototype._registerServiceWorker = function() {
-
-  //Check if Browser supports serviceWorkers
+  //Check if Browser doesn't supports serviceWorkers
   if (!navigator.serviceWorker) return;
 
-  navigator.serviceWorker.register('/sw.js').then(function() {
-    console.log('Service Worker registered...');
-  }).catch(function() {
-    console.log('Service Worker Registration failed...');
+  var indexController = this;
+
+  navigator.serviceWorker.register('/sw.js').then(function(reg) {
+    // if there is no controller, the page wasn't loaded
+    // via a service worker, so they're looking at the latest version.
+    // in that case, exit early
+    if (!navigator.serviceWorker.controller) {
+      return;
+    }
+    // if there is an updated worker already waiting, call
+    // indexController._updateReady
+    if (reg.waiting) {
+      indexController._updateReady(reg.waiting);
+      return;
+    }
+    // if there is an updated worker installing, track its
+    // progress. If it becomes 'installed', called
+    // indexController._updateReady
+    if (reg.installing) {
+      indexController._trackInstalling(reg.installing);
+      return;
+    }
+    // otherwise, listen for new installing workers arriving.
+    // if one arrives, track its progress.
+    // if it becomes 'installed', call
+    // indexController._updateReady
+    reg.addEventListener('updatefound', function() {
+      indexController._trackInstalling(reg.installing);
+    });
   });
 
+  // listen for the controlling service worker changing
+  // and reload the page
+  navigator.serviceWorker.addEventListener('controllerchange', function() {
+    window.location.reload();
+  });
 };
-
-navigator.serviceWorker.register('/sw.js').then(function(reg) {
-  // if there is no controller, the page wasn't loaded
-  // via a service worker, so they're looking at the latest version.
-  // in that case, exit early
-  if (!navigator.serviceWorker.controller) {
-    return;
-  }
-  // if there is an updated worker already waiting, call
-  // indexController._updateReady()
-  if (reg.waiting) {
-    indexController._updateReady();
-    return;
-  }
-  // if there is an updated worker installing, track its
-  // progress. If it becomes 'installed', called
-  // indexController._updateReady()
-  if (reg.installing) {
-    indexController._trackInstalling(reg.installing);
-    return;
-  }
-  // otherwise, listen for new installing workers arriving.
-  // if one arrives, track its progress.
-  // if it becomes 'installed', call
-  // indexController._updateReady()
-  reg.addEventListener('updatefound', function() {
-    indexController._trackInstalling(reg.installing);
-  });
-});
 
 IndexController.prototype._trackInstalling = function(worker) {
   var indexController = this;
-
   worker.addEventListener('statechange', function() {
     if (worker.state == 'installed') {
-      indexController._updateReady();
+      indexController._updateReady(worker);
     }
   });
 };
 
-IndexController.prototype._updateReady = function() {
-  var toast = this._toastsView.show("New Version available", {
-    buttons: ['whatever']
+// When new ServiceWorker is installed prompt to refresh page
+IndexController.prototype._updateReady = function(worker) {
+  var toast = this._toastsView.show("New version available", {
+    buttons: ['refresh', 'dismiss']
+  });
+  // when user choose to refresh
+  toast.answer.then(function(answer) {
+    if (answer != 'refresh') return;
+    // tell the service worker to skipWaiting (see public/js/sw/index.js SW is waiting for postMessage)
+    worker.postMessage({action: 'skipWaiting'});
   });
 };
 
